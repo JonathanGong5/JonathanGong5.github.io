@@ -14259,25 +14259,912 @@ a.anchor-link {
 
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="CMSC320-Final-Project">CMSC320 Final Project<a class="anchor-link" href="#CMSC320-Final-Project">&#182;</a></h2><h3 id="Author:-Jonathan-Gong,-May-16th,-2022">Author: Jonathan Gong, May 16th, 2022<a class="anchor-link" href="#Author:-Jonathan-Gong,-May-16th,-2022">&#182;</a></h3>
+<h1 id="Did-States-With-A-Stricter-Governmental-Response-to-COVID-19-Experience-Worse-Economic-Outcomes?">Did States With A Stricter Governmental Response to COVID-19 Experience Worse Economic Outcomes?<a class="anchor-link" href="#Did-States-With-A-Stricter-Governmental-Response-to-COVID-19-Experience-Worse-Economic-Outcomes?">&#182;</a></h1><h3 id="Jonathan-Gong,-May-16th,-2022">Jonathan Gong, May 16th, 2022<a class="anchor-link" href="#Jonathan-Gong,-May-16th,-2022">&#182;</a></h3>
 </div>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="1.-Data-Collection-Process">1. Data Collection Process<a class="anchor-link" href="#1.-Data-Collection-Process">&#182;</a></h1>
+<h2 id="1.-Introduction">1. Introduction<a class="anchor-link" href="#1.-Introduction">&#182;</a></h2><p>The beginning of the COVID-19 pandemic posed a unique challenge to U.S. society. While international paranoia mounted, American policymakers were tasked with stopping the spread of a virus without damaging ongoing economic progress. Unsurprisingly, as cases rose and shutdowns ensued, the perceived tradeoff between containment policies and economic prosperity grew as well. The purpose of this project is to examine whether stricter enforcement of COVID-19 response measures actually contributed to a net decline in economic outcomes. To accomplish this, I used monthly state-level employment and average weekly earnings measurements as well as ordinal indices from <a href="https://github.com/OxCGRT/USA-covid-policy">Oxford’s COVID-19 government response tracker</a> to perform a fixed-effects Ordinary Least Squares regression.</p>
+<p>I found that the overall effect of higher stringency on economic outcomes was negative but negligible. Specifically, the policies most associated with worse economic conditions were stricter workplace closure mandates and stay-at-home requirements, but neither had a profound scalable impact.</p>
+
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
 </pre></div>
 
      </div>
 </div>
 </div>
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="2.-Data-Collection-for-the-Independent-Variables">2. Data Collection for the Independent Variables<a class="anchor-link" href="#2.-Data-Collection-for-the-Independent-Variables">&#182;</a></h2><h3 id="a)-The-Oxford-COVID-19-Government-Response-Tracker">a) The Oxford COVID-19 Government Response Tracker<a class="anchor-link" href="#a)-The-Oxford-COVID-19-Government-Response-Tracker">&#182;</a></h3><p>This data measures the stringency of each COVID-19 policy response for each state in the U.S. over time (January 2020 to March 2021). It was created by researchers at the Blavatnik School of Government as part of their ongoing endeavor to create the Oxford COVID-19 Government Response Tracker (an aggregatation of information regarding each government's response-level to the pandemic across the entire world). The data I am using is from their <a href="https://www.bsg.ox.ac.uk/sites/default/files/2021-05/BSG-WP-2020-034-v3.pdf">US-specific subnational dataset</a>. I downloaded this data directly as an Excel file from their website. Each sheet in the excel file corresponds to a different policy measure.</p>
+<p>To measure the stringency of any given COVID-19 response policies, the researchers have designed their own system of ordinal metrics. As an example, the variable for “Workplace Closing” is encoded as follows:</p>
+<p><strong>0 - no measures <br>
+1 -  recommend closing (or recommend work from home) or all businesses open with alterations resulting in significant differences compared to non-COVID-19 operation. <br>
+2 - require closing (or work from home) for some sectors or categories of workers <br>
+3 - require closing (or work from home) for all-but-essential workplaces (e.g. grocery stores, doctors)” (“Variation in US states’ COVID-19 policy responses). <br></strong></p>
+<p>An explanation of how each policy measure is encoded can be found in this <a href="https://github.com/OxCGRT/covid-policy-tracker/blob/master/documentation/codebook.md">codebook</a>. For the purposes of this assignment, I hand-selected five specific COVID-19 policies to determine their influence on state-level economic outcomes. They are: (1) Workplace Closures, (2) Restrictions on Gathering, (3) Closing Public Transport, (4) Stay-At-Home Requirements (5) Facial Coverings/Mask Mandates. I also extracted the overall composite index for governmental stringency for visualization purposes.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[2]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># A dictionary with each key corresponding to a different policy response. </span>
+<span class="c1"># The value for each key can be extracted as a policy-specific dataframe</span>
+<span class="n">sheet_to_df_map</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;/Users/jongong/School/Junior Year/CMSC320/Final Project/stringency_indices.xlsx&#39;</span><span class="p">,</span>
+                                <span class="n">sheet_name</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Extracting the time series data specific to each policy</span>
+<span class="n">school_closing_df</span> <span class="o">=</span> <span class="n">sheet_to_df_map</span><span class="p">[</span><span class="s1">&#39;c1_school_closing&#39;</span><span class="p">]</span>
+<span class="n">workplace_closing_df</span> <span class="o">=</span> <span class="n">sheet_to_df_map</span><span class="p">[</span><span class="s1">&#39;c2_workplace_closing&#39;</span><span class="p">]</span>
+<span class="n">restrictions_on_gathering_df</span> <span class="o">=</span> <span class="n">sheet_to_df_map</span><span class="p">[</span><span class="s1">&#39;c4_restrictions_on_gatherings&#39;</span><span class="p">]</span>
+<span class="n">stay_at_home_df</span> <span class="o">=</span> <span class="n">sheet_to_df_map</span><span class="p">[</span><span class="s1">&#39;c6_stay_at_home_requirements&#39;</span><span class="p">]</span>
+<span class="n">close_public_transport_df</span> <span class="o">=</span> <span class="n">sheet_to_df_map</span><span class="p">[</span><span class="s1">&#39;c5_close_public_transport&#39;</span><span class="p">]</span>
+<span class="n">facial_coverings_df</span> <span class="o">=</span> <span class="n">sheet_to_df_map</span><span class="p">[</span><span class="s1">&#39;h6_facial_coverings&#39;</span><span class="p">]</span>
+
+<span class="c1"># Extracting the composite index for each state&#39;s stringency level over time</span>
+<span class="n">stringency_df</span> <span class="o">=</span> <span class="n">sheet_to_df_map</span><span class="p">[</span><span class="s1">&#39;stringency_index&#39;</span><span class="p">]</span>
+
+<span class="n">policy_dfs</span> <span class="o">=</span> <span class="p">[</span><span class="n">school_closing_df</span><span class="p">,</span> <span class="n">workplace_closing_df</span><span class="p">,</span> <span class="n">restrictions_on_gathering_df</span><span class="p">,</span> <span class="n">stay_at_home_df</span><span class="p">,</span>
+              <span class="n">close_public_transport_df</span><span class="p">,</span> <span class="n">facial_coverings_df</span><span class="p">]</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># These are the list of columns to unpivot when we convert from wide to long</span>
+<span class="n">monthYears</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Jan2020&#39;</span><span class="p">,</span> <span class="s1">&#39;Feb2020&#39;</span><span class="p">,</span> <span class="s1">&#39;Mar2020&#39;</span><span class="p">,</span> <span class="s1">&#39;Apr2020&#39;</span><span class="p">,</span> <span class="s1">&#39;May2020&#39;</span><span class="p">,</span> <span class="s1">&#39;Jun2020&#39;</span><span class="p">,</span><span class="s1">&#39;Jul2020&#39;</span><span class="p">,</span> <span class="s1">&#39;Aug2020&#39;</span><span class="p">,</span> <span class="s1">&#39;Sep2020&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;Oct2020&#39;</span><span class="p">,</span> <span class="s1">&#39;Nov2020&#39;</span><span class="p">,</span> <span class="s1">&#39;Dec2020&#39;</span><span class="p">,</span> <span class="s1">&#39;Jan2021&#39;</span><span class="p">,</span> <span class="s1">&#39;Feb2021&#39;</span><span class="p">,</span> <span class="s1">&#39;Mar2021&#39;</span><span class="p">]</span>
+
+<span class="c1"># This is the list columns we want to extract from each policy-specific dataframe</span>
+<span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;01&#39;</span> <span class="o">+</span> <span class="n">elem</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">monthYears</span><span class="p">]</span>
+<span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;region_name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cols</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Extracting the columns of interest (the state name and the ordinal measure of the given policy for each month)</span>
+<span class="c1"># The way this data was provided is inherently wide in its formatting</span>
+<span class="n">wide_school</span> <span class="o">=</span> <span class="n">school_closing_df</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">wide_workplace</span> <span class="o">=</span> <span class="n">workplace_closing_df</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">wide_restrictions</span> <span class="o">=</span> <span class="n">restrictions_on_gathering_df</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">wide_stay_at_home</span> <span class="o">=</span> <span class="n">stay_at_home_df</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">wide_close_public_transport</span> <span class="o">=</span> <span class="n">close_public_transport_df</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">wide_facial_coverings</span> <span class="o">=</span> <span class="n">facial_coverings_df</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">wide_composite_index</span> <span class="o">=</span> <span class="n">stringency_df</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># stripping 01 from all column names -- this turns the specific day into a measurement for the entire month</span>
+<span class="n">wide_school</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">wide_school</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;01&#39;</span><span class="p">)</span>
+<span class="n">wide_workplace</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">wide_workplace</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;01&#39;</span><span class="p">)</span>
+<span class="n">wide_restrictions</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">wide_restrictions</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;01&#39;</span><span class="p">)</span>
+<span class="n">wide_stay_at_home</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">wide_stay_at_home</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;01&#39;</span><span class="p">)</span>
+<span class="n">wide_close_public_transport</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">wide_close_public_transport</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;01&#39;</span><span class="p">)</span>
+<span class="n">wide_facial_coverings</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">wide_facial_coverings</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;01&#39;</span><span class="p">)</span>
+<span class="n">wide_composite_index</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">wide_composite_index</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;01&#39;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># conversion from wide to long format for the eventual regression purposes</span>
+<span class="n">long_school</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">wide_school</span><span class="p">,</span> <span class="n">id_vars</span> <span class="o">=</span> <span class="s1">&#39;region_name&#39;</span><span class="p">,</span> <span class="n">value_vars</span> <span class="o">=</span> <span class="n">monthYears</span><span class="p">,</span> 
+                      <span class="n">var_name</span> <span class="o">=</span> <span class="s1">&#39;monthYear&#39;</span><span class="p">,</span> <span class="n">value_name</span> <span class="o">=</span> <span class="s1">&#39;schoolClosing&#39;</span><span class="p">)</span>
+
+<span class="n">long_workplace</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">wide_workplace</span><span class="p">,</span> <span class="n">id_vars</span> <span class="o">=</span> <span class="s1">&#39;region_name&#39;</span><span class="p">,</span> <span class="n">value_vars</span> <span class="o">=</span> <span class="n">monthYears</span><span class="p">,</span> 
+                      <span class="n">var_name</span> <span class="o">=</span> <span class="s1">&#39;monthYear&#39;</span><span class="p">,</span> <span class="n">value_name</span> <span class="o">=</span> <span class="s1">&#39;workplaceClosures&#39;</span><span class="p">)</span>
+
+<span class="n">long_restrictions</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">wide_restrictions</span><span class="p">,</span> <span class="n">id_vars</span> <span class="o">=</span> <span class="s1">&#39;region_name&#39;</span><span class="p">,</span> <span class="n">value_vars</span> <span class="o">=</span> <span class="n">monthYears</span><span class="p">,</span> 
+                      <span class="n">var_name</span> <span class="o">=</span> <span class="s1">&#39;monthYear&#39;</span><span class="p">,</span> <span class="n">value_name</span> <span class="o">=</span> <span class="s1">&#39;restrictionsOnGathering&#39;</span><span class="p">)</span>
+
+<span class="n">long_stay</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">wide_stay_at_home</span><span class="p">,</span> <span class="n">id_vars</span> <span class="o">=</span> <span class="s1">&#39;region_name&#39;</span><span class="p">,</span> <span class="n">value_vars</span> <span class="o">=</span> <span class="n">monthYears</span><span class="p">,</span> 
+                      <span class="n">var_name</span> <span class="o">=</span> <span class="s1">&#39;monthYear&#39;</span><span class="p">,</span> <span class="n">value_name</span> <span class="o">=</span> <span class="s1">&#39;stayAtHomeRequirements&#39;</span><span class="p">)</span>
+
+<span class="n">long_close</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">wide_close_public_transport</span><span class="p">,</span> <span class="n">id_vars</span> <span class="o">=</span> <span class="s1">&#39;region_name&#39;</span><span class="p">,</span> <span class="n">value_vars</span> <span class="o">=</span> <span class="n">monthYears</span><span class="p">,</span> 
+                      <span class="n">var_name</span> <span class="o">=</span> <span class="s1">&#39;monthYear&#39;</span><span class="p">,</span> <span class="n">value_name</span> <span class="o">=</span> <span class="s1">&#39;closePublicTransport&#39;</span><span class="p">)</span>
+
+<span class="n">long_facial_coverings</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">wide_facial_coverings</span><span class="p">,</span> <span class="n">id_vars</span> <span class="o">=</span> <span class="s1">&#39;region_name&#39;</span><span class="p">,</span> <span class="n">value_vars</span> <span class="o">=</span> <span class="n">monthYears</span><span class="p">,</span> 
+                      <span class="n">var_name</span> <span class="o">=</span> <span class="s1">&#39;monthYear&#39;</span><span class="p">,</span> <span class="n">value_name</span> <span class="o">=</span> <span class="s1">&#39;facialCoverings&#39;</span><span class="p">)</span>
+
+<span class="n">long_composite</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">wide_composite_index</span><span class="p">,</span> <span class="n">id_vars</span> <span class="o">=</span> <span class="s1">&#39;region_name&#39;</span><span class="p">,</span> <span class="n">value_vars</span> <span class="o">=</span> <span class="n">monthYears</span><span class="p">,</span>
+                      <span class="n">var_name</span> <span class="o">=</span> <span class="s1">&#39;monthYear&#39;</span><span class="p">,</span> <span class="n">value_name</span> <span class="o">=</span> <span class="s1">&#39;compositeIndex&#39;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Merging all variables into one dataframe</span>
+<span class="n">master_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">long_school</span><span class="p">,</span> <span class="n">long_workplace</span><span class="p">,</span> <span class="n">how</span> <span class="o">=</span> <span class="s1">&#39;inner&#39;</span><span class="p">,</span> <span class="n">on</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;region_name&#39;</span><span class="p">,</span> <span class="s1">&#39;monthYear&#39;</span><span class="p">])</span>
+<span class="n">master_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">master_df</span><span class="p">,</span> <span class="n">long_restrictions</span><span class="p">,</span> <span class="n">how</span> <span class="o">=</span> <span class="s1">&#39;inner&#39;</span><span class="p">,</span> <span class="n">on</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;region_name&#39;</span><span class="p">,</span> <span class="s1">&#39;monthYear&#39;</span><span class="p">])</span>
+<span class="n">master_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">master_df</span><span class="p">,</span> <span class="n">long_stay</span><span class="p">,</span> <span class="n">how</span> <span class="o">=</span> <span class="s1">&#39;inner&#39;</span><span class="p">,</span> <span class="n">on</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;region_name&#39;</span><span class="p">,</span> <span class="s1">&#39;monthYear&#39;</span><span class="p">])</span>
+<span class="n">master_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">master_df</span><span class="p">,</span> <span class="n">long_close</span><span class="p">,</span> <span class="n">how</span> <span class="o">=</span> <span class="s1">&#39;inner&#39;</span><span class="p">,</span> <span class="n">on</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;region_name&#39;</span><span class="p">,</span> <span class="s1">&#39;monthYear&#39;</span><span class="p">])</span>
+<span class="n">master_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">master_df</span><span class="p">,</span> <span class="n">long_facial_coverings</span><span class="p">,</span> <span class="n">how</span> <span class="o">=</span> <span class="s1">&#39;inner&#39;</span><span class="p">,</span> <span class="n">on</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;region_name&#39;</span><span class="p">,</span> <span class="s1">&#39;monthYear&#39;</span><span class="p">])</span>
+<span class="n">master_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">master_df</span><span class="p">,</span> <span class="n">long_composite</span><span class="p">,</span> <span class="n">how</span> <span class="o">=</span> <span class="s1">&#39;inner&#39;</span><span class="p">,</span> <span class="n">on</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;region_name&#39;</span><span class="p">,</span> <span class="s1">&#39;monthYear&#39;</span><span class="p">])</span>
+
+<span class="c1"># Removing Washington D.C. from the observations</span>
+<span class="n">master_df</span> <span class="o">=</span> <span class="n">master_df</span><span class="p">[</span><span class="n">master_df</span><span class="p">[</span><span class="s1">&#39;region_name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;Washington DC&#39;</span><span class="p">]</span>
+
+<span class="c1"># Renaming region_name to State</span>
+<span class="n">master_df</span> <span class="o">=</span> <span class="n">master_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;region_name&#39;</span><span class="p">:</span> <span class="s1">&#39;State&#39;</span><span class="p">})</span>
+<span class="n">master_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[8]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>State</th>
+      <th>monthYear</th>
+      <th>schoolClosing</th>
+      <th>workplaceClosures</th>
+      <th>restrictionsOnGathering</th>
+      <th>stayAtHomeRequirements</th>
+      <th>closePublicTransport</th>
+      <th>facialCoverings</th>
+      <th>compositeIndex</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Alaska</td>
+      <td>Jan2020</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Alabama</td>
+      <td>Jan2020</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Arkansas</td>
+      <td>Jan2020</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Arizona</td>
+      <td>Jan2020</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>California</td>
+      <td>Jan2020</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="b)-COVID-Data-as-a-Controlling-Variable">b) COVID Data as a Controlling Variable<a class="anchor-link" href="#b)-COVID-Data-as-a-Controlling-Variable">&#182;</a></h3>
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="3.-Data-Collection-for-the-Dependent-Variables">3. Data Collection for the Dependent Variables<a class="anchor-link" href="#3.-Data-Collection-for-the-Dependent-Variables">&#182;</a></h2><h3 id="a)-Employment-Data">a) Employment Data<a class="anchor-link" href="#a)-Employment-Data">&#182;</a></h3><p>The first dependent variable I want to predict is employment. To do this, I needed monthly employment data from January 2020 to March 2021. This is the same period of time that Oxford COVID-19 Government Response Tracker spans. I collected this data by using the <a href="https://data.bls.gov/cew/apps/data_views/data_views.htm#tab=Tables">U.S. Bureau of Labor Statistic's Employment and Wages Data Viewer</a> to create 5 custom data tables corresponding to each quarter in 2020 and the first quarter in 2021. I aggregated the 15 employment columns into a excel file by hand through copy-paste (this is the only time in this project I don't use Pandas to manipulate the data as it was faster than importing and merging 5 separate files), which I subsequently downloaded as a CSV to be imported via pd.read_csv() below.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">monthly_unemployment</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;/Users/jongong/School/Junior Year/CMSC320/Final Project/unemployment_2020_2021.csv&#39;</span><span class="p">)</span>
+<span class="n">monthly_unemployment</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[9]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>State</th>
+      <th>Jan2020</th>
+      <th>Feb2020</th>
+      <th>Mar2020</th>
+      <th>Apr2020</th>
+      <th>May2020</th>
+      <th>Jun2020</th>
+      <th>Jul2020</th>
+      <th>Aug2020</th>
+      <th>Sep2020</th>
+      <th>Oct2020</th>
+      <th>Nov2020</th>
+      <th>Dec2020</th>
+      <th>Jan2021</th>
+      <th>Feb2021</th>
+      <th>Mar2021</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Alabama</td>
+      <td>1975812.0</td>
+      <td>1986981.0</td>
+      <td>1983902.0</td>
+      <td>1765567.0</td>
+      <td>1818011.0</td>
+      <td>1869064.0</td>
+      <td>1882119.0</td>
+      <td>1899453.0</td>
+      <td>1906373.0</td>
+      <td>1931745.0</td>
+      <td>1943477.0</td>
+      <td>1947237.0</td>
+      <td>1920556.0</td>
+      <td>1933652.0</td>
+      <td>1941067.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Alaska</td>
+      <td>306487.0</td>
+      <td>312795.0</td>
+      <td>312279.0</td>
+      <td>274139.0</td>
+      <td>285113.0</td>
+      <td>295672.0</td>
+      <td>296083.0</td>
+      <td>301014.0</td>
+      <td>302898.0</td>
+      <td>299440.0</td>
+      <td>292777.0</td>
+      <td>290456.0</td>
+      <td>287505.0</td>
+      <td>292676.0</td>
+      <td>295335.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Arizona</td>
+      <td>2965780.0</td>
+      <td>2980328.0</td>
+      <td>2961508.0</td>
+      <td>2644935.0</td>
+      <td>2713984.0</td>
+      <td>2713484.0</td>
+      <td>2669676.0</td>
+      <td>2766035.0</td>
+      <td>2798570.0</td>
+      <td>2861631.0</td>
+      <td>2900073.0</td>
+      <td>2909118.0</td>
+      <td>2862767.0</td>
+      <td>2887701.0</td>
+      <td>2897157.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Arkansas</td>
+      <td>1214487.0</td>
+      <td>1219039.0</td>
+      <td>1218904.0</td>
+      <td>1106254.0</td>
+      <td>1138420.0</td>
+      <td>1154662.0</td>
+      <td>1120123.0</td>
+      <td>1158577.0</td>
+      <td>1178792.0</td>
+      <td>1192311.0</td>
+      <td>1198461.0</td>
+      <td>1195555.0</td>
+      <td>1182291.0</td>
+      <td>1180458.0</td>
+      <td>1196931.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>California</td>
+      <td>17609773.0</td>
+      <td>17756208.0</td>
+      <td>17545678.0</td>
+      <td>15067528.0</td>
+      <td>15393849.0</td>
+      <td>15885269.0</td>
+      <td>15723167.0</td>
+      <td>15942691.0</td>
+      <td>16135854.0</td>
+      <td>16479836.0</td>
+      <td>16595570.0</td>
+      <td>16401290.0</td>
+      <td>16051138.0</td>
+      <td>16383074.0</td>
+      <td>16495033.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="b)-Average-Weekly-Earnings">b) Average Weekly Earnings<a class="anchor-link" href="#b)-Average-Weekly-Earnings">&#182;</a></h3><p>The second dependent variable I want to predict is average weekly earnings. I collected this data from the <a href="https://apps.urban.org/features/state-economic-monitor/">The Urban Institute's State Economic Monitor</a>. The CSV file downloaded in the cell below is a file that I was able to download directly from their source data folders.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">average_weekly_earnings</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;/Users/jongong/School/Junior Year/CMSC320/Final Project/weekly_earnings_raw.csv&#39;</span><span class="p">)</span>
+
+<span class="c1"># Extracting the columns of interest</span>
+<span class="n">average_weekly_earnings</span> <span class="o">=</span> <span class="n">average_weekly_earnings</span><span class="p">[[</span><span class="s1">&#39;Geography&#39;</span><span class="p">,</span><span class="s1">&#39;2020-01-01&#39;</span><span class="p">,</span><span class="s1">&#39;2020-02-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-03-01&#39;</span><span class="p">,</span>
+                                                  <span class="s1">&#39;2020-04-01&#39;</span><span class="p">,</span><span class="s1">&#39;2020-05-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-06-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-07-01&#39;</span><span class="p">,</span>
+                                                  <span class="s1">&#39;2020-08-01&#39;</span><span class="p">,</span><span class="s1">&#39;2020-09-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-10-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-11-01&#39;</span><span class="p">,</span>
+                                                  <span class="s1">&#39;2020-12-01&#39;</span><span class="p">,</span><span class="s1">&#39;2021-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2021-02-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2021-03-01&#39;</span><span class="p">]]</span>
+<span class="c1"># Extracting the rows of interest</span>
+<span class="n">average_weekly_earnings</span> <span class="o">=</span> <span class="n">average_weekly_earnings</span><span class="p">[</span><span class="n">average_weekly_earnings</span><span class="p">[</span><span class="s1">&#39;Geography&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;United States&#39;</span><span class="p">]</span>
+<span class="n">average_weekly_earnings</span> <span class="o">=</span> <span class="n">average_weekly_earnings</span><span class="p">[</span><span class="n">average_weekly_earnings</span><span class="p">[</span><span class="s1">&#39;Geography&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;District of Columbia&#39;</span><span class="p">]</span>
+
+<span class="n">col_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Geography&#39;</span><span class="p">:</span> <span class="s1">&#39;State&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-01-01&#39;</span><span class="p">:</span><span class="s1">&#39;Jan2020&#39;</span><span class="p">,</span><span class="s1">&#39;2020-02-01&#39;</span><span class="p">:</span><span class="s1">&#39;Feb2020&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-03-01&#39;</span><span class="p">:</span><span class="s1">&#39;Mar2020&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;2020-04-01&#39;</span><span class="p">:</span><span class="s1">&#39;Apr2020&#39;</span><span class="p">,</span><span class="s1">&#39;2020-05-01&#39;</span><span class="p">:</span><span class="s1">&#39;May2020&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-06-01&#39;</span><span class="p">:</span><span class="s1">&#39;Jun2020&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-07-01&#39;</span><span class="p">:</span><span class="s1">&#39;Jul2020&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;2020-08-01&#39;</span><span class="p">:</span><span class="s1">&#39;Aug2020&#39;</span><span class="p">,</span><span class="s1">&#39;2020-09-01&#39;</span><span class="p">:</span><span class="s1">&#39;Sep2020&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-10-01&#39;</span><span class="p">:</span><span class="s1">&#39;Oct2020&#39;</span><span class="p">,</span> <span class="s1">&#39;2020-11-01&#39;</span><span class="p">:</span><span class="s1">&#39;Nov2020&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;2020-12-01&#39;</span><span class="p">:</span><span class="s1">&#39;Dec2020&#39;</span><span class="p">,</span><span class="s1">&#39;2021-01-01&#39;</span><span class="p">:</span><span class="s1">&#39;Jan2021&#39;</span><span class="p">,</span> <span class="s1">&#39;2021-02-01&#39;</span><span class="p">:</span><span class="s1">&#39;Feb2021&#39;</span><span class="p">,</span> <span class="s1">&#39;2021-03-01&#39;</span><span class="p">:</span><span class="s1">&#39;Mar2021&#39;</span><span class="p">}</span>
+
+<span class="c1"># Renaming columns to match independent variable format for eventual merge</span>
+<span class="n">average_weekly_earnings</span> <span class="o">=</span> <span class="n">average_weekly_earnings</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="n">col_dict</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">average_weekly_earnings</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[10]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>State</th>
+      <th>Jan2020</th>
+      <th>Feb2020</th>
+      <th>Mar2020</th>
+      <th>Apr2020</th>
+      <th>May2020</th>
+      <th>Jun2020</th>
+      <th>Jul2020</th>
+      <th>Aug2020</th>
+      <th>Sep2020</th>
+      <th>Oct2020</th>
+      <th>Nov2020</th>
+      <th>Dec2020</th>
+      <th>Jan2021</th>
+      <th>Feb2021</th>
+      <th>Mar2021</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Alabama</td>
+      <td>972.385423</td>
+      <td>980.797671</td>
+      <td>983.727826</td>
+      <td>1009.648821</td>
+      <td>1017.287861</td>
+      <td>1004.747839</td>
+      <td>1023.215130</td>
+      <td>1042.608228</td>
+      <td>1021.816698</td>
+      <td>1021.591628</td>
+      <td>1042.599594</td>
+      <td>1045.007513</td>
+      <td>1040.614080</td>
+      <td>1007.445655</td>
+      <td>1014.980502</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Alaska</td>
+      <td>1137.362173</td>
+      <td>1169.552819</td>
+      <td>1184.846405</td>
+      <td>1227.405440</td>
+      <td>1232.012624</td>
+      <td>1213.028956</td>
+      <td>1225.931854</td>
+      <td>1258.083028</td>
+      <td>1215.816727</td>
+      <td>1208.058269</td>
+      <td>1205.990171</td>
+      <td>1185.098300</td>
+      <td>1193.784242</td>
+      <td>1163.837320</td>
+      <td>1154.131930</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Arizona</td>
+      <td>1041.984815</td>
+      <td>1075.391975</td>
+      <td>1052.787152</td>
+      <td>1084.398582</td>
+      <td>1070.035539</td>
+      <td>1068.260420</td>
+      <td>1065.347453</td>
+      <td>1095.326549</td>
+      <td>1064.012229</td>
+      <td>1071.189458</td>
+      <td>1095.299104</td>
+      <td>1075.526819</td>
+      <td>1080.137609</td>
+      <td>1058.657995</td>
+      <td>1054.989251</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Arkansas</td>
+      <td>881.989799</td>
+      <td>899.951828</td>
+      <td>891.021249</td>
+      <td>914.254848</td>
+      <td>897.316048</td>
+      <td>897.808043</td>
+      <td>895.985947</td>
+      <td>913.046814</td>
+      <td>901.570481</td>
+      <td>916.323216</td>
+      <td>916.883090</td>
+      <td>895.093152</td>
+      <td>912.162609</td>
+      <td>893.608876</td>
+      <td>914.491897</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>California</td>
+      <td>1256.890352</td>
+      <td>1305.103534</td>
+      <td>1291.075243</td>
+      <td>1324.885139</td>
+      <td>1345.133070</td>
+      <td>1321.942716</td>
+      <td>1327.961537</td>
+      <td>1377.667118</td>
+      <td>1331.534105</td>
+      <td>1344.805624</td>
+      <td>1381.710445</td>
+      <td>1365.598193</td>
+      <td>1365.177433</td>
+      <td>1357.274581</td>
+      <td>1336.982551</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="Standardizing-the-Dependent-Variables">Standardizing the Dependent Variables<a class="anchor-link" href="#Standardizing-the-Dependent-Variables">&#182;</a></h2><p>I will eventually be regressing the above data (employment and average weekly earnings) upon metrics of stringency. To account for the inherent differences in the economic capabilities of each state, I may want to standardize the dependent variables by dividing by 2020 state-population totals as well as 2019 Q4 state-GDP (as a measure of pre-COVID output levels). I collected the population data from the <a href="https://www.census.gov/data/datasets/time-series/demo/popest/2020s-state-total.html#par_textimage_1873399417">US Census Bureau's "State. Population Totals and Components of Change: 2020-2021"</a> data page. I collected State Q4 GDP Levels from the <a href="https://apps.bea.gov/regional/histdata/releases/0420gdpstate/index.cfm">US Bureau of Economic Analysis Archives</a>.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Population Data</span>
+<span class="n">pop_by_state</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;/Users/jongong/School/Junior Year/CMSC320/Final Project/NST-EST2021-alldata.csv&#39;</span><span class="p">)</span>
+
+<span class="c1"># Extracting on the columns of interest</span>
+<span class="n">pop_by_state</span> <span class="o">=</span> <span class="n">pop_by_state</span><span class="p">[[</span><span class="s1">&#39;NAME&#39;</span><span class="p">,</span> <span class="s1">&#39;POPESTIMATE2020&#39;</span><span class="p">]]</span>
+
+<span class="c1"># Removing aggregate regional observations from the dataset</span>
+<span class="n">pop_by_state</span> <span class="o">=</span> <span class="n">pop_by_state</span><span class="p">[</span><span class="n">pop_by_state</span><span class="p">[</span><span class="s1">&#39;NAME&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;United States&#39;</span><span class="p">]</span>
+<span class="n">pop_by_state</span> <span class="o">=</span> <span class="n">pop_by_state</span><span class="p">[</span><span class="n">pop_by_state</span><span class="p">[</span><span class="s1">&#39;NAME&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;Northeast Region&#39;</span><span class="p">]</span>
+<span class="n">pop_by_state</span> <span class="o">=</span> <span class="n">pop_by_state</span><span class="p">[</span><span class="n">pop_by_state</span><span class="p">[</span><span class="s1">&#39;NAME&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;Midwest Region&#39;</span><span class="p">]</span>
+<span class="n">pop_by_state</span> <span class="o">=</span> <span class="n">pop_by_state</span><span class="p">[</span><span class="n">pop_by_state</span><span class="p">[</span><span class="s1">&#39;NAME&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;South Region&#39;</span><span class="p">]</span>
+<span class="n">pop_by_state</span> <span class="o">=</span> <span class="n">pop_by_state</span><span class="p">[</span><span class="n">pop_by_state</span><span class="p">[</span><span class="s1">&#39;NAME&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;West Region&#39;</span><span class="p">]</span>
+
+<span class="c1"># Removing Puerto Rico and Washington D.C. from the dataset for consistency</span>
+<span class="n">pop_by_state</span> <span class="o">=</span> <span class="n">pop_by_state</span><span class="p">[</span><span class="n">pop_by_state</span><span class="p">[</span><span class="s1">&#39;NAME&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;Puerto Rico&#39;</span><span class="p">]</span>
+<span class="n">pop_by_state</span> <span class="o">=</span> <span class="n">pop_by_state</span><span class="p">[</span><span class="n">pop_by_state</span><span class="p">[</span><span class="s1">&#39;NAME&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;District of Columbia&#39;</span><span class="p">]</span>
+<span class="n">pop_by_state</span> <span class="o">=</span> <span class="n">pop_by_state</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NAME&#39;</span><span class="p">:</span><span class="s1">&#39;State&#39;</span><span class="p">})</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">pop_by_state</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[11]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>State</th>
+      <th>POPESTIMATE2020</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Alabama</td>
+      <td>5024803</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Alaska</td>
+      <td>732441</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Arizona</td>
+      <td>7177986</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Arkansas</td>
+      <td>3012232</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>California</td>
+      <td>39499738</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[12]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Q4 GDP Data</span>
+<span class="n">gdp_by_state</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;/Users/jongong/School/Junior Year/CMSC320/Final Project/SQGDP1__ALL_AREAS_2005_2019.csv&#39;</span><span class="p">)</span>
+
+<span class="c1"># Extracting only the columns of interest</span>
+<span class="n">gdp_by_state</span> <span class="o">=</span> <span class="n">gdp_by_state</span><span class="p">[[</span><span class="s1">&#39;GeoName&#39;</span><span class="p">,</span> <span class="s1">&#39;Description&#39;</span><span class="p">,</span><span class="s1">&#39;2019:Q4&#39;</span><span class="p">]]</span>
+
+<span class="c1"># Extracting only the rows of interest</span>
+<span class="n">gdp_by_state</span> <span class="o">=</span> <span class="n">gdp_by_state</span><span class="p">[</span><span class="n">gdp_by_state</span><span class="p">[</span><span class="s1">&#39;Description&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Real GDP (millions of chained 2012 dollars)&#39;</span><span class="p">]</span>
+
+<span class="n">unwanted_obs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;United States&#39;</span><span class="p">,</span> <span class="s1">&#39;District of Columbia&#39;</span><span class="p">,</span> <span class="s1">&#39;New England&#39;</span><span class="p">,</span> <span class="s1">&#39;Mideast&#39;</span><span class="p">,</span> <span class="s1">&#39;Great Lakes&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Plains&#39;</span><span class="p">,</span> <span class="s1">&#39;Southeast&#39;</span><span class="p">,</span> <span class="s1">&#39;Southwest&#39;</span><span class="p">,</span> <span class="s1">&#39;Rocky Mountain&#39;</span><span class="p">,</span> <span class="s1">&#39;Far West&#39;</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="n">unwanted_obs</span><span class="p">:</span>
+    <span class="n">gdp_by_state</span> <span class="o">=</span> <span class="n">gdp_by_state</span><span class="p">[</span><span class="n">gdp_by_state</span><span class="p">[</span><span class="s1">&#39;GeoName&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">obs</span><span class="p">]</span>
+    
+    
+<span class="c1"># Final trivial cleaning</span>
+<span class="n">gdp_by_state</span> <span class="o">=</span> <span class="n">gdp_by_state</span><span class="p">[[</span><span class="s1">&#39;GeoName&#39;</span><span class="p">,</span> <span class="s1">&#39;2019:Q4&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">gdp_by_state</span> <span class="o">=</span> <span class="n">gdp_by_state</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;GeoName&#39;</span><span class="p">:</span> <span class="s1">&#39;State&#39;</span><span class="p">,</span> <span class="s1">&#39;2019:Q4&#39;</span><span class="p">:</span><span class="s1">&#39;2019 Q4 GDP (in millons of 2012 dollars)&#39;</span><span class="p">})</span>
+<span class="n">gdp_by_state</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[12]:</div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>State</th>
+      <th>2019 Q4 GDP (in millons of 2012 dollars)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Alabama</td>
+      <td>204484.3</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Alaska</td>
+      <td>54786.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Arizona</td>
+      <td>324915.4</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Arkansas</td>
+      <td>120535.7</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>California</td>
+      <td>2813699.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+
 </div>
 
 </div>
